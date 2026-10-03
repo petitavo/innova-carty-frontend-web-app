@@ -1,0 +1,65 @@
+<div class="sign-in">
+  <section class="hero">
+    <span class="logo">
+      <img src="logo-mark.svg" width="35" height="35" alt="" class="logo__mark" />
+      INNOVA CARTY
+    </span>
+    <h1>Your whole cart fleet, live.</h1>
+    <p>Monitor active carts, resolve weight discrepancies and control exits from one console.</p>
+  </section>
+
+  <section class="panel">
+    <form [formGroup]="form" (ngSubmit)="submit()" class="form" novalidate>
+      <h2>Sign in to the Console</h2>
+      <p class="muted">Use your store staff account.</p>
+
+      @if (error()) {
+        <div class="error" role="alert"><mat-icon>error</mat-icon>{{ error() }}</div>
+      }
+
+      <mat-form-field appearance="outline">
+        <mat-label>Work email</mat-label>
+        <input matInput type="email" formControlName="email" autocomplete="username" />
+        @if (form.controls.email.hasError('required')) {
+          <mat-error>Enter your work email</mat-error>
+        } @else if (form.controls.email.hasError('email')) {
+          <mat-error>Enter a valid email</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Password</mat-label>
+        <input matInput [type]="hidePassword() ? 'password' : 'text'" formControlName="password" autocomplete="current-password" />
+        <button
+          mat-icon-button
+          matSuffix
+          type="button"
+          (click)="hidePassword.set(!hidePassword())"
+          [attr.aria-label]="hidePassword() ? 'Show password' : 'Hide password'"
+        >
+          <mat-icon>{{ hidePassword() ? 'visibility' : 'visibility_off' }}</mat-icon>
+        </button>
+        @if (form.controls.password.hasError('required')) {
+          <mat-error>Enter your password</mat-error>
+        } @else if (form.controls.password.hasError('minlength')) {
+          <mat-error>At least 6 characters</mat-error>
+        }
+      </mat-form-field>
+
+      <div class="row">
+        <mat-checkbox formControlName="remember">Keep me signed in</mat-checkbox>
+      </div>
+
+      <button mat-flat-button class="submit" type="submit" [disabled]="loading()">Sign in</button>
+      @if (loading()) {
+        <mat-progress-bar mode="indeterminate" />
+      }
+
+      <p class="caption">Access is restricted to authorized staff. Activity is logged for auditing.</p>
+      <p class="demo caption">
+        <mat-icon>info</mat-icon>
+        <span>Demo account: <b>lucia.medina&#64;retailco.pe</b> · password <b>demo1234</b> · supervisor PIN <b>2468</b></span>
+      </p>
+    </form>
+  </section>
+</div>

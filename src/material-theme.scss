@@ -1,0 +1,54 @@
+// Angular Material 3 theme with the Innova Carty tokens from 5.1.1 General Style Guidelines.
+@use '@angular/material' as mat;
+
+html {
+  height: 100%;
+  @include mat.theme(
+    (
+      color: (
+        primary: mat.$azure-palette,
+        tertiary: mat.$green-palette,
+      ),
+      typography: (
+        plain-family: 'Roboto, system-ui, sans-serif',
+        brand-family: 'Inter, system-ui, sans-serif',
+      ),
+      density: 0,
+    )
+  );
+
+  // Brand colors on top of the generated palette.
+  @include mat.theme-overrides(
+    (
+      primary: #004f8c,
+      on-primary: #ffffff,
+      primary-container: #d6e6f5,
+      on-primary-container: #004f8c,
+      secondary-container: #d6e6f5,
+      on-secondary-container: #004f8c,
+      tertiary: #009e60,
+      on-tertiary: #ffffff,
+      tertiary-container: #d3f2e4,
+      on-tertiary-container: #00663e,
+      error: #e74c3c,
+      surface: #ffffff,
+      surface-container-lowest: #ffffff,
+      surface-container-low: #f4f7fa,
+      surface-container: #f4f7fa,
+      surface-container-high: #eef2f6,
+      on-surface: #102a43,
+      on-surface-variant: #486581,
+      outline: #829ab1,
+      outline-variant: #d9e2ec,
+    )
+  );
+}
+
+body {
+  color-scheme: light;
+  background-color: var(--ic-surface-2);
+  color: var(--mat-sys-on-surface);
+  font: var(--mat-sys-body-medium);
+  margin: 0;
+  height: 100%;
+}

@@ -1,0 +1,8 @@
+table { min-width: 900px; }
+.small { width: 16px; height: 16px; font-size: 16px; }
+.category { width: 200px; }
+.name { display: inline-flex; align-items: center; gap: 10px; font-weight: 500; }
+.name mat-icon { width: 20px; height: 20px; font-size: 20px; }
+.no-data { padding: 24px 16px; color: var(--ic-ink-2); }
+.error { display: flex; align-items: center; gap: 10px; padding: 14px 16px; color: #b3261e; }
+.mat-column-id, .mat-column-price, .mat-column-rfidPrefix, .mat-column-nominalWeight { white-space: nowrap; }

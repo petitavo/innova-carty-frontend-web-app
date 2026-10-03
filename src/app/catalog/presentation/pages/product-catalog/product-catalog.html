@@ -1,0 +1,81 @@
+<section class="page">
+  <div class="page-head">
+    <h2>Catalog &amp; weight tolerances</h2>
+    @if (lastSync(); as sync) {
+      <span class="caption row"><mat-icon class="small">sync</mat-icon> Last sync to carts: {{ sync | date: 'HH:mm' }}</span>
+    }
+    <button mat-flat-button (click)="openForm(null)"><mat-icon>add</mat-icon> Add product</button>
+  </div>
+
+  <div class="toolbar">
+    <mat-form-field appearance="outline" class="search-field" subscriptSizing="dynamic">
+      <mat-icon matPrefix>search</mat-icon>
+      <input matInput placeholder="Search by name, SKU or RFID tag" [value]="query()" (input)="query.set($any($event.target).value)" aria-label="Search products" />
+    </mat-form-field>
+    <mat-form-field appearance="outline" class="category" subscriptSizing="dynamic">
+      <mat-label>Category</mat-label>
+      <mat-select [value]="category()" (valueChange)="category.set($event)">
+        <mat-option value="">All categories</mat-option>
+        @for (c of categories; track c) { <mat-option [value]="c">{{ c }}</mat-option> }
+      </mat-select>
+    </mat-form-field>
+    <mat-chip-listbox multiple aria-label="Quick filters">
+      <mat-chip-option [selected]="highTolerance()" (selectionChange)="highTolerance.set($event.selected)">Tolerance &gt; 5%</mat-chip-option>
+    </mat-chip-listbox>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" />
+  }
+  @if (failed()) {
+    <div class="card error" role="alert"><mat-icon>cloud_off</mat-icon> We could not load the catalog. Check that the API is running.</div>
+  }
+
+  <div class="card table-card">
+    <div class="table-scroll">
+      <table mat-table [dataSource]="dataSource" matSort aria-label="Product catalog">
+        <ng-container matColumnDef="id">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>SKU</th>
+          <td mat-cell *matCellDef="let p" class="caption">{{ p.id }}</td>
+        </ng-container>
+        <ng-container matColumnDef="name">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Product</th>
+          <td mat-cell *matCellDef="let p"><span class="name"><mat-icon class="muted">{{ p.icon }}</mat-icon>{{ p.name }}</span></td>
+        </ng-container>
+        <ng-container matColumnDef="category">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Category</th>
+          <td mat-cell *matCellDef="let p">{{ p.category }}</td>
+        </ng-container>
+        <ng-container matColumnDef="rfidPrefix">
+          <th mat-header-cell *matHeaderCellDef>RFID tag prefix</th>
+          <td mat-cell *matCellDef="let p" class="caption">{{ p.rfidPrefix }}</td>
+        </ng-container>
+        <ng-container matColumnDef="price">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Price</th>
+          <td mat-cell *matCellDef="let p" class="num">{{ p.price | currency: 'PEN' : 'S/ ' }}</td>
+        </ng-container>
+        <ng-container matColumnDef="nominalWeight">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Nominal weight</th>
+          <td mat-cell *matCellDef="let p">{{ p.nominalWeight | number }} g</td>
+        </ng-container>
+        <ng-container matColumnDef="tolerance">
+          <th mat-header-cell *matHeaderCellDef mat-sort-header>Tolerance</th>
+          <td mat-cell *matCellDef="let p"><span class="chip {{ p.tolerance > 5 ? 'warn' : 'off' }}">± {{ p.tolerance }}%</span></td>
+        </ng-container>
+        <ng-container matColumnDef="edit">
+          <th mat-header-cell *matHeaderCellDef><span class="cdk-visually-hidden">Edit</span></th>
+          <td mat-cell *matCellDef="let p">
+            <button mat-icon-button (click)="openForm(p)" [attr.aria-label]="'Edit ' + p.name" matTooltip="Edit"><mat-icon>edit</mat-icon></button>
+          </td>
+        </ng-container>
+
+        <tr mat-header-row *matHeaderRowDef="columns"></tr>
+        <tr mat-row *matRowDef="let row; columns: columns"></tr>
+        <tr class="mat-row" *matNoDataRow>
+          <td class="mat-cell no-data" [attr.colspan]="columns.length">No products match the filters.</td>
+        </tr>
+      </table>
+    </div>
+    <mat-paginator [length]="dataSource.filteredData.length" [pageSize]="10" [pageSizeOptions]="[10, 25, 50]" aria-label="Select page of products" />
+  </div>
+</section>

@@ -1,0 +1,24 @@
+.sign-in { display: flex; min-height: 100vh; background: var(--ic-surface); }
+
+.hero { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 20px; padding: 64px; background: var(--ic-hero); color: #fff; }
+.hero h1 { color: #fff; font-size: 44px; max-width: 520px; }
+.hero p { font-size: 18px; opacity: 0.85; max-width: 480px; }
+.logo { display: inline-flex; align-items: center; gap: 10px; font: 800 22px var(--ic-font-title); letter-spacing: 0.5px; }
+.logo__mark { filter: brightness(0) invert(1); }
+
+.panel { width: 560px; display: flex; align-items: center; padding: 0 88px; }
+.form { width: 100%; display: flex; flex-direction: column; gap: 6px; }
+.form h2 { margin-bottom: 2px; }
+.form > p.muted { margin-bottom: 16px; }
+.submit { height: 52px; border-radius: 26px; margin: 8px 0; font-size: 16px; }
+.error { display: flex; align-items: center; gap: 8px; padding: 10px 12px; margin-bottom: 8px; border-radius: 8px; background: var(--ic-error-container); color: #b3261e; font-size: 14px; }
+.demo { display: flex; gap: 8px; align-items: flex-start; margin-top: 16px; padding: 10px 12px; border-radius: 8px; background: var(--ic-primary-container); color: var(--ic-primary); }
+.demo mat-icon { flex: none; width: 18px; height: 18px; font-size: 18px; }
+
+@media (max-width: 959px) {
+  .sign-in { flex-direction: column; }
+  .hero { flex: none; padding: 32px 20px; }
+  .hero h1 { font-size: 30px; }
+  .hero p { font-size: 16px; }
+  .panel { width: 100%; padding: 28px 20px 40px; }
+}

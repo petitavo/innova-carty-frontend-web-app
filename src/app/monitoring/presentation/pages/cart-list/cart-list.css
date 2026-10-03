@@ -1,0 +1,8 @@
+table { min-width: 960px; }
+.tight { gap: 0; }
+.attention { background: var(--ic-warning-container); }
+.battery mat-icon { width: 18px; height: 18px; font-size: 18px; }
+.battery.low { color: var(--ic-error); }
+.no-data { padding: 24px 16px; color: var(--ic-ink-2); }
+.error { display: flex; align-items: center; gap: 10px; padding: 14px 16px; color: #b3261e; }
+.mat-column-id, .mat-column-total, .mat-column-budget, .mat-column-status { white-space: nowrap; }

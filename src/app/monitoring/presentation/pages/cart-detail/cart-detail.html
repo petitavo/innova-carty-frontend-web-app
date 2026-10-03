@@ -1,0 +1,115 @@
+<section class="page">
+  <div class="page-head">
+    <h2 class="row">
+      {{ id() }}
+      @if (cart(); as c) {
+        <app-status-chip [status]="c.status" />
+      }
+    </h2>
+    <a mat-button routerLink="/carts"><mat-icon>arrow_back</mat-icon> Back to carts</a>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" />
+  } @else if (notFound()) {
+    <div class="card empty" role="alert">
+      <mat-icon>search_off</mat-icon>
+      <p>The cart <b>{{ id() }}</b> does not exist or the API is not reachable.</p>
+    </div>
+  } @else if (cart(); as c) {
+    <div class="layout">
+      <div class="col main-col">
+        @if (c.status === 'DISCREPANCY' && session(); as s) {
+          <div class="card incident warn">
+            <div class="row"><h4>Weight check failed</h4><span class="spacer"></span><span class="caption">Detected {{ c.lastEventAt | date: 'HH:mm:ss' }} · {{ c.zone }}</span></div>
+            <div class="metrics">
+              <div class="metric"><span class="caption">Expected (RFID items)</span><span class="num">{{ s.expectedWeight | number }} g</span></div>
+              <div class="metric"><span class="caption">Measured weight</span><span class="num">{{ s.measuredWeight | number }} g</span></div>
+              <div class="metric"><span class="caption">Difference</span><span class="num" [class.bad]="!weightOk()">{{ difference() > 0 ? '+' : '' }}{{ difference() | number }} g</span></div>
+              <div class="metric"><span class="caption">Tolerance</span><span class="num">± {{ s.weightTolerance | number }} g</span></div>
+            </div>
+            <p class="muted">Payment is paused on the cart. The shopper was asked to place the last item again.</p>
+            <div class="row actions">
+              <button mat-flat-button (click)="unlock()"><mat-icon>lock_open</mat-icon> Verify and unlock</button>
+              <button mat-stroked-button (click)="flag()"><mat-icon>flag</mat-icon> Add audit flag</button>
+            </div>
+          </div>
+        }
+
+        @if (c.status === 'LOCKED') {
+          <div class="card incident err">
+            <div class="row"><h4>Exit blocked · wheels locked</h4><span class="spacer"></span><span class="caption">{{ c.lastEventAt | date: 'HH:mm:ss' }} · {{ c.zone }}</span></div>
+            <p class="muted">{{ geofenceAlert()?.description ?? c.lastEvent }}</p>
+            <div class="row actions">
+              <button mat-flat-button (click)="unlock()"><mat-icon>lock_open</mat-icon> Verify and unlock</button>
+              <button mat-stroked-button (click)="flag()"><mat-icon>flag</mat-icon> Add audit flag</button>
+            </div>
+          </div>
+        }
+
+        <div class="card summary">
+          <div class="stat"><span class="caption">Shopper</span><b>{{ session()?.shopper ?? '—' }}</b></div>
+          <div class="stat"><span class="caption">Items</span><b>{{ c.itemsCount || '—' }}</b></div>
+          <div class="stat"><span class="caption">Total</span><b class="num">{{ c.total | currency: 'PEN' : 'S/ ' }}</b></div>
+          <div class="stat">
+            <span class="caption">Budget</span>
+            <b>{{ c.budget ? (c.budget | currency: 'PEN' : 'S/ ') : 'No limit' }}</b>
+            @if (budgetPct() !== null) {
+              <mat-progress-bar mode="determinate" [value]="budgetPct()" [class.over]="budgetPct()! >= 90" />
+            }
+          </div>
+          <div class="stat"><span class="caption">Battery</span><b [class.bad]="c.battery < 20">{{ c.battery }}%</b></div>
+        </div>
+
+        <div class="card table-card">
+          <div class="row table-head">
+            <h4>Items in cart ({{ cart()?.itemsCount ?? 0 }})</h4><span class="spacer"></span>
+            @if (session(); as s) { <span class="caption">Order {{ s.id }}</span> }
+          </div>
+          <div class="table-scroll">
+            <table class="items">
+              <thead><tr><th>Product</th><th>RFID tag</th><th>Qty</th><th>Nominal weight</th><th>Subtotal</th></tr></thead>
+              <tbody>
+                @for (it of session()?.items ?? []; track it.sku) {
+                  <tr>
+                    <td>{{ it.name }}</td>
+                    <td class="caption">{{ it.rfidTag }}</td>
+                    <td>{{ it.quantity }}</td>
+                    <td>{{ it.nominalWeight * it.quantity | number }} g</td>
+                    <td class="num">{{ it.unitPrice * it.quantity | currency: 'PEN' : 'S/ ' }}</td>
+                  </tr>
+                } @empty {
+                  <tr><td colspan="5" class="muted">The cart is empty.</td></tr>
+                }
+                @if (c.status === 'DISCREPANCY' && !weightOk()) {
+                  <tr class="unknown">
+                    <td><b>Unidentified mass</b></td><td class="caption">— no tag read —</td><td>?</td>
+                    <td><b>{{ difference() > 0 ? '+' : '' }}{{ difference() | number }} g</b></td><td>—</td>
+                  </tr>
+                }
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <aside class="card timeline">
+        <h4>Session timeline</h4>
+        @for (e of events(); track e.id; let last = $last) {
+          <div class="event">
+            <div class="rail">
+              <span class="chip {{ toneChip[e.tone] }} dot"><mat-icon>{{ eventIcons[e.type] ?? 'radio_button_checked' }}</mat-icon></span>
+              @if (!last) { <span class="line"></span> }
+            </div>
+            <div class="col event__text">
+              <span class="event__title">{{ e.title }}</span>
+              <span class="caption">{{ e.occurredAt | date: 'HH:mm:ss' }} · {{ e.detail }}</span>
+            </div>
+          </div>
+        } @empty {
+          <p class="muted">No events yet for this cart.</p>
+        }
+      </aside>
+    </div>
+  }
+</section>

@@ -1,0 +1,45 @@
+.layout { display: grid; grid-template-columns: minmax(0, 1fr) 380px; gap: 16px; align-items: start; }
+.main-col { gap: 16px; min-width: 0; }
+
+.incident { padding: 20px; display: flex; flex-direction: column; gap: 12px; }
+.incident.warn { border-left: 5px solid var(--ic-warning); }
+.incident.err { border-left: 5px solid var(--ic-error); }
+.incident p { font-size: 14px; }
+.metrics { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
+.metric { display: flex; flex-direction: column; gap: 2px; padding: 14px; border-radius: 12px; background: var(--ic-surface-2); border: 1px solid var(--ic-line); }
+.metric .num { font-size: 22px; font-weight: 700; }
+.bad { color: #b3261e; }
+.actions { flex-wrap: wrap; gap: 10px; }
+
+.summary { display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px; padding: 16px 20px; }
+.stat { display: flex; flex-direction: column; gap: 4px; }
+.stat b { font-size: 16px; }
+.stat mat-progress-bar { margin-top: 4px; border-radius: 4px; }
+.over { --mat-progress-bar-active-indicator-color: var(--ic-warning); }
+
+.table-head { padding: 14px 16px; }
+table.items { width: 100%; border-collapse: collapse; font-size: 14px; min-width: 560px; }
+.items th { text-align: left; font-weight: 500; color: var(--ic-ink-2); font-size: 13px; padding: 10px 16px; border-bottom: 1px solid var(--ic-line); background: var(--ic-surface-2); }
+.items td { padding: 12px 16px; border-bottom: 1px solid var(--ic-line); }
+.items tr.unknown { background: var(--ic-warning-container); }
+
+.timeline { padding: 20px; display: flex; flex-direction: column; }
+.timeline h4 { margin-bottom: 12px; }
+.event { display: flex; gap: 12px; }
+.rail { display: flex; flex-direction: column; align-items: center; }
+.dot { width: 30px; height: 30px; padding: 0; border-radius: 50%; justify-content: center; flex: none; }
+.line { width: 2px; flex: 1; min-height: 22px; background: var(--ic-line); }
+.event__text { gap: 0; flex: 1; padding-bottom: 14px; }
+.event__title { font-size: 14px; font-weight: 500; }
+
+.empty { display: flex; align-items: center; gap: 12px; padding: 20px; }
+
+@media (max-width: 1200px) {
+  .layout { grid-template-columns: 1fr; }
+  .summary { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 700px) {
+  .metrics { grid-template-columns: repeat(2, 1fr); }
+  .summary { grid-template-columns: repeat(2, 1fr); }
+}
+.items td.num { white-space: nowrap; }

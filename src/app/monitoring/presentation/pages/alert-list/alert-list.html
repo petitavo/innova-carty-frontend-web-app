@@ -1,0 +1,40 @@
+<section class="page">
+  <div class="page-head"><h2>Alerts</h2></div>
+
+  <mat-tab-group [selectedIndex]="selected()" (selectedIndexChange)="selected.set($event)" mat-stretch-tabs="false" animationDuration="0ms">
+    @for (t of tabs; track t.label; let i = $index) {
+      <mat-tab [label]="t.label + ' (' + counts()[i] + ')'" />
+    }
+  </mat-tab-group>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" />
+  } @else if (failed()) {
+    <div class="card empty" role="alert"><mat-icon>cloud_off</mat-icon> We could not load the alerts.</div>
+  } @else {
+    <div class="list">
+      @for (a of visible(); track a.id) {
+        <article class="card alert {{ tones[a.severity] }}">
+          <span class="chip {{ tones[a.severity] }} icon"><mat-icon>{{ icons[a.type] }}</mat-icon></span>
+          <div class="col text">
+            <b>{{ a.title }}</b>
+            <span class="muted">{{ a.description }}</span>
+            <span class="caption">
+              {{ a.zone }} · {{ a.createdAt | date: 'HH:mm' }}
+              @if (a.status === 'ACKNOWLEDGED') { · <span class="chip info small">Acknowledged</span> }
+              @if (a.status === 'RESOLVED') { · <span class="chip ok small">Resolved</span> }
+            </span>
+          </div>
+          <div class="row actions">
+            <a mat-flat-button class="tonal" [routerLink]="['/carts', a.cartId]">{{ cta[a.type] }}</a>
+            @if (a.status === 'OPEN') {
+              <button mat-button (click)="acknowledge(a)">Acknowledge</button>
+            }
+          </div>
+        </article>
+      } @empty {
+        <div class="card empty"><mat-icon class="ok">check_circle</mat-icon> Nothing here. All clear.</div>
+      }
+    </div>
+  }
+</section>

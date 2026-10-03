@@ -1,0 +1,10 @@
+.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 0 14px; padding-top: 4px; }
+.span { grid-column: 1 / -1; }
+.range { display: flex; flex-direction: column; justify-content: center; gap: 2px; height: 56px; padding: 0 14px; border-radius: 4px; background: var(--ic-surface-2); }
+.sync { display: flex; align-items: center; gap: 8px; padding: 10px 12px; border-radius: 8px; background: var(--ic-primary-container); color: var(--ic-primary); font-size: 13px; margin-top: 8px; }
+.sync mat-icon { width: 18px; height: 18px; font-size: 18px; }
+.error { color: #b3261e; font-size: 14px; margin-top: 8px; }
+
+@media (max-width: 560px) {
+  .grid { grid-template-columns: 1fr; }
+}

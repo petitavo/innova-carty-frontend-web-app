@@ -1,0 +1,70 @@
+<section class="page">
+  <div class="page-head">
+    <h2>{{ greeting() }}</h2>
+    <span class="caption live"><span class="pulse"></span> Live · refreshes every 5 s</span>
+  </div>
+
+  @if (loading()) {
+    <mat-progress-bar mode="indeterminate" />
+  } @else if (failed()) {
+    <div class="card empty" role="alert">
+      <mat-icon>cloud_off</mat-icon>
+      <p>We could not load the fleet data. Check that the API is running (<code>npm run api</code>).</p>
+    </div>
+  } @else {
+    <div class="kpis">
+      <a class="card kpi" routerLink="/carts">
+        <div class="row"><span class="muted">Active carts</span><span class="spacer"></span><span class="chip ok icon"><mat-icon>shopping_cart</mat-icon></span></div>
+        <span class="num value">{{ activeCount() }} / {{ store()?.fleetSize ?? carts().length }}</span>
+        <span class="caption">{{ carts().length }} carts reporting to the gateway</span>
+      </a>
+      <a class="card kpi" routerLink="/alerts">
+        <div class="row"><span class="muted">Open alerts</span><span class="spacer"></span><span class="chip err icon"><mat-icon>notifications_active</mat-icon></span></div>
+        <span class="num value">{{ openAlerts().length }}</span>
+        <span class="caption">{{ criticalCount() }} critical · {{ openAlerts().length - criticalCount() }} warnings</span>
+      </a>
+      <div class="card kpi">
+        <div class="row"><span class="muted">Avg. checkout time</span><span class="spacer"></span><span class="chip info icon"><mat-icon>timer</mat-icon></span></div>
+        <span class="num value">{{ store()?.avgCheckoutSeconds }} s</span>
+        <span class="caption">↓ {{ -(store()?.checkoutTimeVsCashier ?? 0) }}% vs. cashier lanes</span>
+      </div>
+      <div class="card kpi">
+        <div class="row"><span class="muted">Shrinkage prevented</span><span class="spacer"></span><span class="chip warn icon"><mat-icon>savings</mat-icon></span></div>
+        <span class="num value">{{ store()?.shrinkagePreventedWeek | currency: 'PEN' : 'S/ ' : '1.0-0' }}</span>
+        <span class="caption">This week · {{ store()?.discrepanciesSolvedWeek }} discrepancies solved</span>
+      </div>
+    </div>
+
+    <div class="grid">
+      <div class="card panel">
+        <div class="row"><h4>Active sessions by hour</h4><span class="spacer"></span><span class="chip off">Today</span></div>
+        <app-line-chart [points]="chart()" ariaLabel="Active shopping sessions by hour, today" />
+      </div>
+
+      <div class="card panel alerts">
+        <div class="row"><h4>Live alerts</h4><span class="spacer"></span><a mat-button routerLink="/alerts">View all</a></div>
+        @for (alert of openAlerts().slice(0, 4); track alert.id) {
+          <a class="alert" [routerLink]="['/carts', alert.cartId]">
+            <span class="chip {{ tones[alert.severity] }} square"><mat-icon>{{ icons[alert.type] }}</mat-icon></span>
+            <span class="col alert__text">
+              <span class="alert__title">{{ alert.cartId }} · {{ alert.title }}</span>
+              <span class="caption">{{ alert.zone }} · {{ alert.createdAt | date: 'HH:mm' }}</span>
+            </span>
+            <mat-icon class="muted">chevron_right</mat-icon>
+          </a>
+        } @empty {
+          <p class="muted empty-alerts"><mat-icon>check_circle</mat-icon> No open alerts. The fleet is running smoothly.</p>
+        }
+      </div>
+    </div>
+
+    <div class="card fleet">
+      <h4>Fleet status</h4>
+      @for (f of fleet(); track f.status) {
+        <a class="row" [routerLink]="['/carts']" [queryParams]="{ status: f.status }">
+          <span class="chip {{ f.tone }}">{{ f.label }}</span><b>{{ f.count }}</b>
+        </a>
+      }
+    </div>
+  }
+</section>

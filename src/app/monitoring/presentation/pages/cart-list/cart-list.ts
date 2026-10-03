@@ -11,11 +11,12 @@ import { MatProgressBarModule } from '@angular/material/progress-bar';
 import { MatSort, MatSortModule } from '@angular/material/sort';
 import { MatTableDataSource, MatTableModule } from '@angular/material/table';
 import { ActivatedRoute, Router } from '@angular/router';
-import { catchError, of } from 'rxjs';
+import { catchError, combineLatest, map, of } from 'rxjs';
 import { poll } from '../../../../shared/infrastructure/polling';
 import { StatusChip, cartStatusLabel } from '../../../../shared/presentation/components/status-chip/status-chip';
+import { isOpen } from '../../../domain/model/alert.entity';
 import { CART_STATUSES, Cart, CartStatus, needsAttention } from '../../../domain/model/cart.entity';
-import { CartsApi } from '../../../infrastructure/monitoring-api';
+import { AlertsApi, CartsApi } from '../../../infrastructure/monitoring-api';
 
 type Filter = CartStatus | 'ALL';
 
@@ -40,15 +41,30 @@ type Filter = CartStatus | 'ALL';
 })
 export class CartList implements AfterViewInit {
   private readonly api = inject(CartsApi);
+  private readonly alertsApi = inject(AlertsApi);
   private readonly router = inject(Router);
   private readonly route = inject(ActivatedRoute);
 
-  protected readonly columns = ['id', 'status', 'itemsCount', 'total', 'budget', 'zone', 'lastEvent', 'battery', 'open'];
+  protected readonly columns = ['id', 'status', 'itemsCount', 'total', 'budget', 'zone', 'lastEvent', 'alerts', 'battery', 'open'];
   protected readonly dataSource = new MatTableDataSource<Cart>([]);
   private readonly paginator = viewChild(MatPaginator);
   private readonly sort = viewChild(MatSort);
 
-  private readonly carts = toSignal(poll(() => this.api.getAll().pipe(catchError(() => of(null)))));
+  private readonly live = toSignal(
+    poll(() =>
+      combineLatest([this.api.getAll(), this.alertsApi.getAll()]).pipe(
+        map(([carts, alerts]) => {
+          const open = new Map<string, number>();
+          alerts.filter(isOpen).forEach((a) => open.set(a.cartId, (open.get(a.cartId) ?? 0) + 1));
+          return { carts, open };
+        }),
+        catchError(() => of(null)),
+      ),
+    ),
+  );
+  private readonly carts = computed(() => (this.live() === undefined ? undefined : (this.live()?.carts ?? null)));
+  /** Open alerts per cart (US11, scenario 1: "alertas vigentes"). */
+  protected readonly openAlerts = computed(() => this.live()?.open ?? new Map<string, number>());
   protected readonly loading = computed(() => this.carts() === undefined);
   protected readonly failed = computed(() => this.carts() === null);
 

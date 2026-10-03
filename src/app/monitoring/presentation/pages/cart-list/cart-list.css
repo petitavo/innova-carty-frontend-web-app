@@ -6,3 +6,4 @@ table { min-width: 960px; }
 .no-data { padding: 24px 16px; color: var(--ic-ink-2); }
 .error { display: flex; align-items: center; gap: 10px; padding: 14px 16px; color: #b3261e; }
 .mat-column-id, .mat-column-total, .mat-column-budget, .mat-column-status { white-space: nowrap; }
+.mat-column-lastEvent { min-width: 190px; } .mat-column-zone { white-space: nowrap; }
